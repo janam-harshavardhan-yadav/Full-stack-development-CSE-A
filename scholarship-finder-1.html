@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Scholarship Finder — Smart Scholarship Discovery & Deadline Management</title>
+<meta name="description" content="Discover scholarships, check eligibility, track applications and never miss a deadline.">
+<style>
+:root{
+  --navy:#0f1b3d;--ink:#1e2a4a;--muted:#5b6788;--bg:#f6f7fb;--card:#fff;--line:#e3e7f1;
+  --indigo:#4f46e5;--indigo-d:#3b34c4;--indigo-l:#eceafe;--teal:#0d9488;--teal-l:#d9f4f0;
+  --amber:#d97706;--amber-l:#fdf0d8;--red:#dc2626;--red-l:#fde4e4;
+  --r-sm:8px;--r:14px;--r-lg:22px;--sh:0 1px 2px rgba(15,27,61,.06),0 4px 14px rgba(15,27,61,.06);
+  --sh-h:0 8px 28px rgba(15,27,61,.14);--dur:.28s;--focus:0 0 0 3px #fff,0 0 0 5px var(--indigo);
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--bg)}
+h1,h2,h3{color:var(--navy);line-height:1.15;margin:0}
+a{color:var(--indigo)}
+:focus-visible{outline:none;box-shadow:var(--focus);border-radius:var(--r-sm)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+.skip{position:absolute;left:-999px;top:8px;background:var(--navy);color:#fff;padding:8px 14px;border-radius:8px;z-index:99}.skip:focus{left:8px}
+/* nav */
+header.nav{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px;gap:12px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;color:var(--navy);text-decoration:none;font-size:18px}
+.nav nav{display:flex;gap:4px;align-items:center}
+.nav nav a{color:var(--navy);text-decoration:none;font-weight:600;font-size:14px;padding:8px 12px;border-radius:99px}
+.nav nav a:hover{background:var(--indigo-l)}
+.badge-count{background:var(--indigo);color:#fff;border-radius:99px;font-size:11px;padding:1px 7px;margin-left:4px}
+@media(max-width:720px){.nav nav a.hide-m{display:none}}
+/* buttons */
+.btn{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:99px;padding:11px 20px;font:600 15px inherit;font-family:inherit;cursor:pointer;text-decoration:none;transition:transform var(--dur),box-shadow var(--dur),background var(--dur)}
+.btn-p{background:var(--indigo);color:#fff;box-shadow:0 6px 16px rgba(79,70,229,.3)}.btn-p:hover{background:var(--indigo-d);transform:translateY(-1px)}
+.btn-s{background:#fff;color:var(--navy);border:1.5px solid var(--line)}.btn-s:hover{border-color:var(--indigo);color:var(--indigo)}
+.btn-sm{padding:7px 14px;font-size:13px}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+/* hero */
+.hero{background:linear-gradient(180deg,#fff 0%,var(--bg) 100%);overflow:hidden}
+.hero .wrap{display:grid;grid-template-columns:1.05fr 1fr;gap:28px;align-items:center;padding-top:44px;padding-bottom:56px}
+@media(max-width:900px){.hero .wrap{grid-template-columns:1fr}}
+.eyebrow{display:inline-flex;gap:8px;align-items:center;background:var(--teal-l);color:#0b6b62;font-weight:700;font-size:13px;padding:6px 12px;border-radius:99px}
+.hero h1{font-size:clamp(32px,5vw,54px);letter-spacing:-.02em;margin:16px 0 14px}
+.hero h1 em{font-style:normal;color:var(--indigo)}
+.hero p.lead{font-size:18px;color:var(--muted);max-width:540px;margin:0 0 22px}
+.searchbar{display:flex;gap:8px;background:#fff;border:1.5px solid var(--line);border-radius:99px;padding:6px 6px 6px 18px;box-shadow:var(--sh);max-width:560px}
+.searchbar input{flex:1;border:0;background:none;font:inherit;min-width:0;outline:none}
+.searchbar:focus-within{border-color:var(--indigo);box-shadow:0 0 0 4px var(--indigo-l)}
+.trust{display:flex;gap:18px;flex-wrap:wrap;margin-top:18px;color:var(--muted);font-size:14px}
+.trust span::before{content:"✓ ";color:var(--teal);font-weight:800}
+.art{width:100%;height:auto;max-width:560px;justify-self:center}
+/* reveal */
+.rv{opacity:0;transform:translateY(14px);animation:rv .7s cubic-bezier(.2,.7,.2,1) forwards;animation-delay:calc(var(--i,0)*90ms)}
+@keyframes rv{to{opacity:1;transform:none}}
+.float{animation:flt 6s ease-in-out infinite}.float.b{animation-delay:-2s}.float.c{animation-delay:-4s}
+@keyframes flt{50%{transform:translateY(-9px)}}
+.hand{transform-origin:200px 76px;animation:tick 8s linear infinite}
+@keyframes tick{to{transform:rotate(360deg)}}
+.pulse{animation:pl 2.4s ease-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes pl{0%{transform:scale(.8);opacity:.9}100%{transform:scale(1.9);opacity:0}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}.rv{opacity:1;transform:none}}
+/* sections */
+section{padding:56px 0}
+.sec-h{display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap;margin-bottom:24px}
+.sec-h h2{font-size:clamp(26px,3.5vw,36px)}.sec-h p{margin:6px 0 0;color:var(--muted)}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+.step{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:22px;box-shadow:var(--sh)}
+.step svg{width:56px;height:56px;margin-bottom:10px}.step h3{font-size:18px;margin-bottom:6px}.step p{margin:0;color:var(--muted);font-size:15px}
+/* finder */
+.finder{display:grid;grid-template-columns:290px 1fr;gap:22px;align-items:start}
+@media(max-width:900px){.finder{grid-template-columns:1fr}}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:var(--sh)}
+.filters{position:sticky;top:80px}
+@media(max-width:900px){.filters{position:static}.filters[hidden-m]{display:none}.fbtn{display:inline-flex!important}}
+.fbtn{display:none}
+label.f{display:block;font-size:13px;font-weight:700;color:var(--navy);margin:12px 0 5px}
+select,input[type=text],input[type=number],input[type=search],textarea{width:100%;font:inherit;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
+select:focus,input:focus,textarea:focus{outline:none;border-color:var(--indigo);box-shadow:0 0 0 3px var(--indigo-l)}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.bar .count{font-weight:700;color:var(--navy)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:16px;min-height:300px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:var(--sh);display:flex;flex-direction:column;gap:10px;transition:transform var(--dur),box-shadow var(--dur);animation:rv .5s both;animation-delay:calc(var(--i,0)*45ms)}
+.card:hover{transform:translateY(-3px);box-shadow:var(--sh-h)}
+.card h3{font-size:18px}
+.prov{color:var(--muted);font-size:14px;margin-top:-4px}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;background:var(--indigo-l);color:var(--indigo-d)}
+.tag.t{background:var(--teal-l);color:#0b6b62}.tag.a{background:var(--amber-l);color:#92520a}.tag.r{background:var(--red-l);color:#a31b1b}.tag.g{background:#eef0f6;color:var(--muted)}
+.amt{font-weight:800;color:var(--navy)}
+.card p.d{margin:0;color:var(--muted);font-size:14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.cd{display:flex;gap:8px;align-items:stretch}
+.cd .u{background:var(--bg);border-radius:10px;padding:6px 10px;text-align:center;min-width:58px}
+.cd .u b{display:block;font-size:20px;color:var(--navy);font-variant-numeric:tabular-nums;line-height:1.1}
+.cd .u small{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.cd.soon .u{background:var(--amber-l)}.cd.soon .u b{color:#92520a}
+.cd.urgent .u{background:var(--red-l)}.cd.urgent .u b{color:#a31b1b}
+.cd-x{background:#eef0f6;color:var(--muted);padding:9px 12px;border-radius:10px;font-weight:700;font-size:14px}
+.dl-date{font-size:12.5px;color:var(--muted)}
+.actions{display:flex;gap:8px;margin-top:auto;flex-wrap:wrap}
+.save{border:1.5px solid var(--line);background:#fff;border-radius:99px;padding:7px 13px;font:600 13px inherit;font-family:inherit;cursor:pointer;color:var(--navy);transition:all var(--dur)}
+.save[aria-pressed=true]{background:var(--indigo);color:#fff;border-color:var(--indigo)}
+.empty,.err{grid-column:1/-1;text-align:center;padding:44px 20px;background:var(--card);border:1.5px dashed var(--line);border-radius:var(--r)}
+.empty svg{width:120px;margin-bottom:8px}
+.skel{height:230px;border-radius:var(--r);background:linear-gradient(90deg,#eceff6 25%,#f6f8fc 50%,#eceff6 75%);background-size:200% 100%;animation:sk 1.2s infinite}
+@keyframes sk{to{background-position:-200% 0}}
+.pager{display:flex;gap:6px;justify-content:center;margin-top:20px;flex-wrap:wrap}
+.pager button{min-width:40px;height:40px;border-radius:10px;border:1.5px solid var(--line);background:#fff;font:600 14px inherit;font-family:inherit;cursor:pointer}
+.pager button[aria-current=page]{background:var(--navy);color:#fff;border-color:var(--navy)}
+.pager button:disabled{opacity:.4;cursor:not-allowed}
+/* eligibility */
+.elig{display:flex;gap:10px;align-items:flex-start;border-radius:12px;padding:10px 12px;font-size:13.5px}
+.elig.eligible{background:var(--teal-l);color:#075e56}.elig.potential{background:var(--amber-l);color:#7a430a}
+.elig.not{background:var(--red-l);color:#8f1a1a}.elig.unknown{background:#eef0f6;color:var(--muted)}
+.elig b{display:block}
+.elig ul{margin:4px 0 0;padding-left:18px}
+/* dashboard */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:20px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:var(--sh)}
+.stat b{font-size:32px;color:var(--navy);display:block;line-height:1}.stat span{color:var(--muted);font-size:14px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}@media(max-width:800px){.two{grid-template-columns:1fr}}
+.row{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}.row:last-child{border:0}
+.prog{height:10px;background:#e8ebf4;border-radius:99px;overflow:hidden}
+.prog i{display:block;height:100%;background:linear-gradient(90deg,var(--teal),#14b8a6);border-radius:99px;transition:width .5s cubic-bezier(.2,.7,.2,1)}
+/* modal */
+dialog{border:0;border-radius:var(--r-lg);padding:0;max-width:680px;width:calc(100% - 28px);box-shadow:0 30px 80px rgba(15,27,61,.35)}
+dialog::backdrop{background:rgba(15,27,61,.55)}
+dialog[open]{animation:pop .3s cubic-bezier(.2,.8,.2,1)}@keyframes pop{from{opacity:0;transform:translateY(16px) scale(.98)}}
+.m-h{padding:22px 24px 8px;display:flex;justify-content:space-between;gap:12px}
+.m-b{padding:8px 24px 24px;max-height:70vh;overflow:auto}
+.x{border:0;background:var(--bg);width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;flex:none}
+.chk{display:flex;gap:12px;align-items:center;padding:10px 12px;border:1.5px solid var(--line);border-radius:12px;margin-bottom:8px;cursor:pointer;transition:background var(--dur),border-color var(--dur)}
+.chk:hover{border-color:var(--indigo)}
+.chk input{position:absolute;opacity:0}
+.chk .box{width:24px;height:24px;border-radius:7px;border:2px solid #b8c0d6;display:grid;place-items:center;flex:none;transition:all var(--dur)}
+.chk .box svg{width:14px;stroke:#fff;stroke-width:3;fill:none;stroke-dasharray:20;stroke-dashoffset:20;transition:stroke-dashoffset .35s}
+.chk input:checked~.box{background:var(--teal);border-color:var(--teal)}.chk input:checked~.box svg{stroke-dashoffset:0}
+.chk input:checked~.t{text-decoration:line-through;color:var(--muted)}
+.chk input:focus-visible~.box{box-shadow:var(--focus)}
+.kv{display:grid;grid-template-columns:140px 1fr;gap:6px 12px;font-size:14px;margin:12px 0}.kv dt{color:var(--muted)}.kv dd{margin:0;font-weight:600}
+#toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,30px);background:var(--navy);color:#fff;padding:12px 20px;border-radius:99px;opacity:0;pointer-events:none;transition:all .3s;z-index:60;font-weight:600;max-width:90vw}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+footer{background:var(--navy);color:#c5cce2;padding:36px 0;font-size:14px}
+footer a{color:#fff}
+.note{background:var(--amber-l);color:#7a430a;border-radius:12px;padding:10px 14px;font-size:14px;margin-bottom:16px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+</head>
+<body>
+<a class="skip" href="#finder">Skip to scholarships</a>
+
+<header class="nav"><div class="wrap">
+  <a class="brand" href="#top" aria-label="Scholarship Finder home">
+    <svg width="34" height="34" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="11" fill="#4f46e5"/><path d="M20 9 6 16l14 7 11-5.5V26h2.5V16z" fill="#fff"/><path d="M12 21v5c0 2.5 4 4.5 8 4.5s8-2 8-4.5v-5l-8 4z" fill="#a5b4fc"/></svg>
+    Scholarship Finder
+  </a>
+  <nav aria-label="Main">
+    <a class="hide-m" href="#how">How it works</a>
+    <a href="#finder">Find</a>
+    <a href="#eligibility" class="hide-m">Eligibility</a>
+    <a href="#dashboard">My dashboard <span class="badge-count" id="navCount">0</span></a>
+  </nav>
+</div></header>
+
+<main id="top">
+<!-- HERO -->
+<div class="hero"><div class="wrap">
+  <div>
+    <span class="eyebrow rv" style="--i:0">● Discover · Check · Track</span>
+    <h1 class="rv" style="--i:1">Never miss a <em>scholarship</em> deadline again.</h1>
+    <p class="lead rv" style="--i:2">Search opportunities, understand eligibility before you apply, keep your document checklist ready and watch every deadline count down in one calm place.</p>
+    <form class="searchbar rv" style="--i:3" id="heroSearch" role="search">
+      <label class="sr" for="heroQ">Search scholarships</label>
+      <input id="heroQ" type="search" placeholder="Search by title, provider or keyword…" autocomplete="off">
+      <button class="btn btn-p" type="submit">Search</button>
+    </form>
+    <div class="trust rv" style="--i:4"><span>Official links only</span><span>Eligibility explained</span><span>Deadlines in IST</span></div>
+  </div>
+
+  <!-- Hero illustration -->
+  <svg class="art" viewBox="0 0 520 440" role="img" aria-label="Illustration of scholarship documents, a deadline calendar and a clock">
+    <defs>
+      <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#eceafe"/><stop offset="1" stop-color="#d9f4f0"/></linearGradient>
+      <linearGradient id="g2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6366f1"/><stop offset="1" stop-color="#4338ca"/></linearGradient>
+      <filter id="sh" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#0f1b3d" flood-opacity=".18"/></filter>
+    </defs>
+    <circle cx="270" cy="225" r="200" fill="url(#g1)"/>
+    <circle cx="90" cy="90" r="6" fill="#14b8a6"/><circle cx="470" cy="120" r="5" fill="#f59e0b"/><circle cx="440" cy="380" r="7" fill="#6366f1" opacity=".5"/>
+    <!-- back document -->
+    <g class="float b"><g transform="rotate(-8 140 250)" filter="url(#sh)">
+      <rect x="60" y="150" width="170" height="210" rx="14" fill="#fff"/>
+      <rect x="78" y="172" width="70" height="10" rx="5" fill="#c7d2fe"/>
+      <rect x="78" y="196" width="130" height="8" rx="4" fill="#e3e7f1"/><rect x="78" y="214" width="110" height="8" rx="4" fill="#e3e7f1"/>
+      <g fill="none" stroke="#0d9488" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="78" y="244" width="16" height="16" rx="4" fill="#d9f4f0" stroke="none"/><path d="M82 252l4 4 7-8"/>
+        <rect x="78" y="272" width="16" height="16" rx="4" fill="#d9f4f0" stroke="none"/><path d="M82 280l4 4 7-8"/>
+        <rect x="78" y="300" width="16" height="16" rx="4" stroke="#b8c0d6" stroke-width="2"/></g>
+      <rect x="104" y="248" width="90" height="8" rx="4" fill="#e3e7f1"/><rect x="104" y="276" width="70" height="8" rx="4" fill="#e3e7f1"/><rect x="104" y="304" width="80" height="8" rx="4" fill="#e3e7f1"/>
+    </g></g>
+    <!-- main card -->
+    <g class="float"><g filter="url(#sh)">
+      <rect x="170" y="70" width="230" height="170" rx="18" fill="#fff"/>
+      <rect x="170" y="70" width="230" height="46" rx="18" fill="url(#g2)"/><rect x="170" y="98" width="230" height="18" fill="url(#g2)"/>
+      <path d="M200 86l-14 6 14 6 14-6z M194 100v6c0 3 12 3 12 0v-6" fill="#fff" opacity=".95" transform="translate(4 -2)"/>
+      <rect x="226" y="86" width="100" height="9" rx="4.5" fill="#fff" opacity=".9"/><rect x="226" y="101" width="64" height="7" rx="3.5" fill="#fff" opacity=".55"/>
+      <rect x="188" y="134" width="120" height="9" rx="4.5" fill="#1e2a4a"/><rect x="188" y="152" width="170" height="7" rx="3.5" fill="#e3e7f1"/><rect x="188" y="166" width="140" height="7" rx="3.5" fill="#e3e7f1"/>
+      <rect x="188" y="190" width="86" height="30" rx="15" fill="#4f46e5"/><rect x="204" y="202" width="54" height="7" rx="3.5" fill="#fff"/>
+      <rect x="284" y="190" width="30" height="30" rx="15" fill="#eceafe"/><path d="M299 198l2.4 5 5.4.6-4 3.7 1.1 5.3-4.9-2.7-4.9 2.7 1.1-5.3-4-3.7 5.4-.6z" fill="#4f46e5"/>
+      <rect x="330" y="196" width="52" height="20" rx="10" fill="#d9f4f0"/><rect x="340" y="203" width="32" height="6" rx="3" fill="#0d9488"/>
+    </g></g>
+    <!-- calendar -->
+    <g class="float c"><g filter="url(#sh)">
+      <rect x="300" y="240" width="160" height="150" rx="16" fill="#fff"/>
+      <path d="M300 256a16 16 0 0 1 16-16h128a16 16 0 0 1 16 16v26H300z" fill="#f59e0b"/>
+      <rect x="326" y="230" width="9" height="22" rx="4.5" fill="#0f1b3d"/><rect x="425" y="230" width="9" height="22" rx="4.5" fill="#0f1b3d"/>
+      <g fill="#e3e7f1"><rect x="318" y="298" width="20" height="16" rx="4"/><rect x="346" y="298" width="20" height="16" rx="4"/><rect x="374" y="298" width="20" height="16" rx="4"/><rect x="402" y="298" width="20" height="16" rx="4"/>
+      <rect x="318" y="322" width="20" height="16" rx="4"/><rect x="346" y="322" width="20" height="16" rx="4"/><rect x="402" y="322" width="20" height="16" rx="4"/>
+      <rect x="318" y="346" width="20" height="16" rx="4"/><rect x="346" y="346" width="20" height="16" rx="4"/><rect x="374" y="346" width="20" height="16" rx="4"/></g>
+      <rect x="374" y="322" width="20" height="16" rx="4" fill="#dc2626"/><circle class="pulse" cx="384" cy="330" r="10" fill="#dc2626" opacity=".5"/>
+      <text x="344" y="271" font-size="13" font-weight="800" fill="#fff" font-family="system-ui">DEADLINE</text>
+    </g></g>
+    <!-- clock -->
+    <g class="float b"><g filter="url(#sh)">
+      <circle cx="140" cy="76" r="48" fill="#fff"/><circle cx="140" cy="76" r="40" fill="#f6f7fb" stroke="#e3e7f1" stroke-width="2"/>
+      <g stroke="#b8c0d6" stroke-width="2.5" stroke-linecap="round"><path d="M140 42v6M140 104v6M106 76h6M168 76h6"/></g>
+      <path d="M140 76V58" stroke="#0f1b3d" stroke-width="4" stroke-linecap="round"/>
+      <g class="hand" style="transform-origin:140px 76px"><path d="M140 76V50" stroke="#14b8a6" stroke-width="3" stroke-linecap="round"/></g>
+      <circle cx="140" cy="76" r="4.5" fill="#4f46e5"/>
+    </g></g>
+    <!-- rupee coin -->
+    <g class="float c"><circle cx="90" cy="380" r="30" fill="#fbbf24"/><circle cx="90" cy="380" r="23" fill="none" stroke="#f59e0b" stroke-width="3"/><text x="90" y="391" text-anchor="middle" font-size="30" font-weight="800" fill="#b45309" font-family="system-ui">₹</text></g>
+  </svg>
+</div></div>
+
+<!-- HOW -->
+<section id="how"><div class="wrap">
+  <div class="sec-h"><div><h2>From scattered links to a clear plan</h2><p>Four steps that keep you organised from discovery to submission.</p></div></div>
+  <div class="steps">
+    <div class="step rv" style="--i:0"><svg viewBox="0 0 56 56"><circle cx="24" cy="24" r="14" fill="#eceafe" stroke="#4f46e5" stroke-width="4"/><path d="M35 35l12 12" stroke="#4f46e5" stroke-width="5" stroke-linecap="round"/></svg><h3>1 · Discover</h3><p>Search and combine filters for level, state, course, category and award range.</p></div>
+    <div class="step rv" style="--i:1"><svg viewBox="0 0 56 56"><rect x="8" y="6" width="40" height="44" rx="8" fill="#d9f4f0"/><path d="M18 28l7 7 13-14" fill="none" stroke="#0d9488" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg><h3>2 · Check eligibility</h3><p>See why you match, might match, or don't — with reasons, never guesses.</p></div>
+    <div class="step rv" style="--i:2"><svg viewBox="0 0 56 56"><rect x="6" y="10" width="44" height="40" rx="8" fill="#fdf0d8"/><rect x="6" y="10" width="44" height="12" rx="6" fill="#f59e0b"/><circle cx="36" cy="36" r="6" fill="#dc2626"/></svg><h3>3 · Track deadlines</h3><p>Live countdowns in Asia/Kolkata time. Expired listings are clearly marked.</p></div>
+    <div class="step rv" style="--i:3"><svg viewBox="0 0 56 56"><rect x="10" y="6" width="36" height="44" rx="7" fill="#eceafe"/><g stroke="#4f46e5" stroke-width="4" stroke-linecap="round"><path d="M18 20h20M18 29h20M18 38h12"/></g></svg><h3>4 · Prepare documents</h3><p>A saved checklist per scholarship shows exactly what is ready.</p></div>
+  </div>
+</div></section>
+
+<!-- FINDER -->
+<section id="finder" style="padding-top:20px"><div class="wrap">
+  <div class="sec-h"><div><h2>Find scholarships</h2><p>Filters combine together and are saved in the page URL so you can share a search.</p></div>
+  <button class="btn btn-s btn-sm fbtn" id="toggleF" aria-expanded="true" aria-controls="filters">Filters</button></div>
+  <div class="note"><b>Demonstration data.</b> The listings below are fictional samples that show how the product behaves. Real listings must be added and verified from official sources before publishing. Nothing here promises any award.</div>
+  <div class="finder">
+    <aside class="panel filters" id="filters" aria-label="Filters">
+      <label class="f" for="q">Keyword</label><input id="q" type="search" placeholder="Title, provider, description">
+      <label class="f" for="fLevel">Education level</label><select id="fLevel"><option value="">Any</option></select>
+      <label class="f" for="fCourse">Course</label><select id="fCourse"><option value="">Any</option></select>
+      <label class="f" for="fState">State eligibility</label><select id="fState"><option value="">Any</option></select>
+      <label class="f" for="fCat">Category</label><select id="fCat"><option value="">Any</option></select>
+      <label class="f" for="fAmt">Award amount</label>
+      <select id="fAmt"><option value="">Any</option><option value="0-25000">Up to ₹25,000</option><option value="25000-50000">₹25,000 – ₹50,000</option><option value="50000-100000">₹50,000 – ₹1,00,000</option><option value="100000-">Above ₹1,00,000</option></select>
+      <label class="f" for="fStatus">Application status</label>
+      <select id="fStatus"><option value="">Any</option><option value="open">Open</option><option value="closed">Closed</option><option value="soon">Closing in 14 days</option></select>
+      <label class="f" for="sort">Sort by</label>
+      <select id="sort"><option value="deadline">Deadline (soonest)</option><option value="amount">Award amount (high)</option><option value="verified">Recently verified</option><option value="title">Title (A–Z)</option></select>
+      <button class="btn btn-s" style="width:100%;justify-content:center;margin-top:16px" id="reset">Reset filters</button>
+    </aside>
+    <div>
+      <div class="bar"><span class="count" id="count" aria-live="polite"></span><span class="tag t" id="profTag" hidden></span></div>
+      <div class="grid" id="grid" aria-busy="false"></div>
+      <nav class="pager" id="pager" aria-label="Pagination"></nav>
+    </div>
+  </div>
+</div></section>
+
+<!-- ELIGIBILITY -->
+<section id="eligibility" style="background:#fff;border-block:1px solid var(--line)"><div class="wrap">
+  <div class="sec-h"><div><h2>Your profile, your eligibility</h2><p>Tell us what you know. Missing details are never treated as a match.</p></div></div>
+  <div class="two">
+    <form class="panel" id="profForm">
+      <label class="f" for="pName">Display name</label><input type="text" id="pName" autocomplete="name">
+      <label class="f" for="pLevel">Education level</label><select id="pLevel"><option value="">Prefer not to say</option></select>
+      <label class="f" for="pState">State</label><select id="pState"><option value="">Prefer not to say</option></select>
+      <label class="f" for="pCourse">Course</label><select id="pCourse"><option value="">Prefer not to say</option></select>
+      <label class="f" for="pIncome">Annual family income (₹, optional)</label><input type="number" id="pIncome" min="0" step="1000" inputmode="numeric">
+      <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap"><button class="btn btn-p" type="submit">Save profile</button><button class="btn btn-s" type="button" id="clearProf">Clear</button></div>
+    </form>
+    <div class="panel">
+      <h3 style="margin-bottom:10px">How matching works</h3>
+      <div class="elig eligible" style="margin-bottom:8px"><span>✓</span><div><b>Eligible based on known criteria</b>Every documented rule matches your profile.</div></div>
+      <div class="elig potential" style="margin-bottom:8px"><span>?</span><div><b>Potential match</b>Nothing conflicts, but some details need verification.</div></div>
+      <div class="elig not" style="margin-bottom:8px"><span>✕</span><div><b>Not eligible</b>A documented rule clearly doesn't match.</div></div>
+      <div class="elig unknown"><span>…</span><div><b>Insufficient information</b>Add profile details to see a result.</div></div>
+      <p style="color:var(--muted);font-size:14px">Always confirm requirements on the provider's official page — they are the source of truth.</p>
+    </div>
+  </div>
+</div></section>
+
+<!-- DASHBOARD -->
+<section id="dashboard"><div class="wrap">
+  <div class="sec-h"><div><h2 id="hello">Your dashboard</h2><p>Saved and synchronized with SQLite backend database.</p></div></div>
+  <div class="stats" id="stats"></div>
+  <div class="two">
+    <div class="panel"><h3 style="margin-bottom:6px">Upcoming deadlines</h3><div id="upcoming"></div></div>
+    <div class="panel"><h3 style="margin-bottom:6px">Application tracker</h3><div id="apps"></div></div>
+  </div>
+  <div class="panel" style="margin-top:16px"><h3 style="margin-bottom:6px">Saved scholarships</h3><div id="savedList"></div></div>
+</div></section>
+</main>
+
+<footer><div class="wrap">
+  <b style="color:#fff">Scholarship Finder</b> — Smart Scholarship Discovery & Deadline Management.
+  <p style="margin:8px 0 0">Always verify details on the official provider website before applying. Listings marked “demo” are samples, not real programs.</p>
+</div></footer>
+
+<dialog id="dlg" aria-labelledby="dTitle"><div id="dBody"></div></dialog>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+"use strict";
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s), esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const INR=n=>"₹"+Number(n).toLocaleString("en-IN");
+const store={get(){try{return JSON.parse(localStorage.getItem("sf_v1"))||{}}catch(e){return {}}},set(v){try{localStorage.setItem("sf_v1",JSON.stringify(v))}catch(e){}}};
+let S=Object.assign({saved:[],apps:{},checks:{},profile:{}},store.get());
+const persist=()=>store.set(S);
+const API=(window.location.protocol==="http:"||window.location.protocol==="https:")?"":"http://localhost:3000";
+async function api(path,opt={}){try{const r=await fetch(API+path,{headers:{"Content-Type":"application/json",...(opt.headers||{})},...opt});return await r.json()}catch(e){return null}}
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove("on"),2400)}
+
+/* ---------- demo data (FICTIONAL — for demonstration only) ---------- */
+const IST=ms=>{const p=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date(ms));return new Date(p+"T23:59:00+05:30").getTime()};
+const day=86400000, now0=Date.now();
+const D=(n)=>n==null?null:IST(now0+n*day);
+const RAW=[
+ ["Merit Horizon Undergraduate Award","Demo Education Trust","Supports high-performing undergraduate students in engineering and science programmes.",30000,60000,["Undergraduate"],[],["Engineering","Science"],"Merit",null,-40,45,0],
+ ["Rural Scholars Support Grant","Demo Rural Foundation","Assists students from rural districts of selected states with tuition costs.",20000,40000,["Undergraduate","Diploma"],["Andhra Pradesh","Telangana","Karnataka"],[],"Need-based",300000,-20,9,2],
+ ["Women in Technology Fellowship","Demo Tech Alliance","Encourages women pursuing computer science and related technology degrees.",50000,100000,["Undergraduate","Postgraduate"],[],["Computer Science","Engineering"],"Gender",null,-30,21,1],
+ ["Postgraduate Research Starter","Demo Research Council","Seed funding for first-year postgraduate research in science and humanities.",75000,150000,["Postgraduate"],[],["Science","Humanities"],"Research",null,-60,64,5],
+ ["Medical Aspirants Assistance","Demo Health Society","Need-based support for students enrolled in MBBS or allied health courses.",40000,80000,["Undergraduate"],[],["Medicine"],"Need-based",500000,-25,33,3],
+ ["School Excellence Prize","Demo Learning Circle","Recognises Class 11–12 students with outstanding academic records.",10000,25000,["Class 11-12"],[],[],"Merit",null,-15,4,6],
+ ["Coastal States Commerce Grant","Demo Commerce Forum","Grant for commerce and management students in coastal states.",25000,50000,["Undergraduate","Postgraduate"],["Andhra Pradesh","Tamil Nadu","Kerala","Gujarat","Maharashtra"],["Commerce","Management"],"Course-based",null,-10,16,4],
+ ["First Generation Learner Bursary","Demo Access Initiative","Supports first-generation college students with study materials and fees.",15000,30000,["Undergraduate","Diploma"],[],[],"Need-based",250000,-35,52,7],
+ ["Open Source Builders Scholarship","Demo Developer Community","For students who contribute to open-source software projects.",35000,70000,["Undergraduate"],[],["Computer Science","Engineering"],"Skill-based",null,-18,27,8],
+ ["Arts & Culture Talent Award","Demo Culture Trust","Funding for students pursuing fine arts, music and performing arts.",20000,45000,["Undergraduate","Postgraduate","Diploma"],[],["Arts","Humanities"],"Talent",null,-45,38,9],
+ ["Diploma Skills Advancement","Demo Skills Board","Helps diploma students finish technical certifications.",12000,24000,["Diploma"],[],["Engineering"],"Course-based",350000,-12,-6,10],
+ ["Sports Achievers Support","Demo Sports Foundation","Assists students who represent at district level or above.",30000,60000,["Class 11-12","Undergraduate"],[],[],"Talent",null,-22,12,11],
+ ["Global Study Preparation Grant","Demo Overseas Fund","Towards test fees and preparation for overseas postgraduate study.",60000,120000,["Postgraduate"],[],[],"Merit",null,-8,75,12],
+ ["Teaching Careers Scholarship","Demo Educators Network","For students enrolled in B.Ed or education programmes.",18000,36000,["Undergraduate","Postgraduate"],[],["Education"],"Course-based",400000,-28,-1,13]
+];
+const DOCS=["Identity proof","Latest academic marksheet","Institution enrollment proof","Passport-size photograph"];
+const SCH=RAW.map((r,i)=>({id:"demo-"+(i+1),slug:r[0].toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/-$/,""),title:r[0],provider:r[1],desc:r[2],min:r[3],max:r[4],levels:r[5],states:r[6],courses:r[7],cat:r[8],income:r[9],open:D(r[10]),deadline:D(r[11]),verifiedAgo:r[12],verified:now0-r[12]*day,
+  docs:DOCS.concat(r[9]?["Income certificate"]:[],r[7].length?["Course enrollment letter"]:[])}));
+const uniq=a=>[...new Set(a)].sort();
+const LEVELS=["Class 11-12","Diploma","Undergraduate","Postgraduate"];
+const COURSES=uniq(SCH.flatMap(s=>s.courses));
+const STATES=["Andhra Pradesh","Gujarat","Karnataka","Kerala","Maharashtra","Tamil Nadu","Telangana","Uttar Pradesh","West Bengal","Delhi"].sort();
+const CATS=uniq(SCH.map(s=>s.cat));
+const STATUSES=["Interested","Preparing documents","Ready to apply","Submitted","Awarded","Not selected","Withdrawn"];
+
+/* ---------- deadline engine ---------- */
+function dl(ts){ if(ts==null)return{state:"none"}; const ms=ts-Date.now(); if(ms<=0)return{state:"expired"};
+  const d=Math.floor(ms/day),h=Math.floor(ms%day/36e5),m=Math.floor(ms%36e5/6e4);
+  return{state:d<=3?"urgent":d<=14?"soon":"ok",d,h,m,ms} }
+const fmtDate=ts=>ts==null?"No deadline published":new Intl.DateTimeFormat("en-IN",{timeZone:"Asia/Kolkata",dateStyle:"medium"}).format(ts)+" · 11:59 PM IST";
+function cdHTML(ts){const x=dl(ts);
+  if(x.state==="none")return'<div class="cd-x">Deadline not published — check official site</div>';
+  if(x.state==="expired")return'<div class="cd-x">Expired</div>';
+  return`<div class="cd ${x.state}" data-ts="${ts}" aria-label="${x.d} days ${x.h} hours ${x.m} minutes remaining"><div class="u"><b>${x.d}</b><small>days</small></div><div class="u"><b>${x.h}</b><small>hrs</small></div><div class="u"><b>${x.m}</b><small>min</small></div></div>`}
+setInterval(()=>{document.querySelectorAll(".cd[data-ts]").forEach(el=>{const ts=+el.dataset.ts,x=dl(ts);
+  if(x.state==="expired"){el.outerHTML='<div class="cd-x">Expired</div>';return}
+  const b=el.querySelectorAll("b");b[0].textContent=x.d;b[1].textContent=x.h;b[2].textContent=x.m;el.className="cd "+x.state})},15000);
+
+/* ---------- eligibility engine ---------- */
+function eligibility(s,p){
+  const checks=[];
+  if(s.levels.length){checks.push(!p.level?["unknown","Education level not provided"]:s.levels.includes(p.level)?["match","Education level matches"]:["mismatch","Requires "+s.levels.join(" / ")+" level"])}
+  if(s.states.length){checks.push(!p.state?["unknown","State not provided"]:s.states.includes(p.state)?["match","State is eligible"]:["mismatch","Limited to "+s.states.join(", ")])}
+  if(s.courses.length){checks.push(!p.course?["unknown","Course not provided"]:s.courses.includes(p.course)?["match","Course matches"]:["mismatch","Limited to "+s.courses.join(", ")+" courses"])}
+  if(s.income!=null){checks.push(p.income==null||p.income===""?["unknown","Family income not provided (limit "+INR(s.income)+")"]:+p.income<=s.income?["match","Income within "+INR(s.income)+" limit"]:["mismatch","Income above the "+INR(s.income)+" limit"])}
+  const mm=checks.filter(c=>c[0]==="mismatch"),un=checks.filter(c=>c[0]==="unknown"),ma=checks.filter(c=>c[0]==="match");
+  let k; if(mm.length)k="not"; else if(!checks.length)k="potential"; else if(!ma.length)k="unknown"; else if(un.length)k="potential"; else k="eligible";
+  const label={eligible:"Eligible based on known criteria",potential:"Potential match — verify details",not:"Not eligible (confirmed mismatch)",unknown:"Insufficient information"}[k];
+  return{k,label,reasons:checks.map(c=>c[1]),checks}
+}
+const hasProfile=()=>Object.values(S.profile).some(v=>v!==""&&v!=null);
+
+/* ---------- query state / URL ---------- */
+const F=["q","level","course","state","cat","amt","status","sort","page"];
+const el={q:$("#q"),level:$("#fLevel"),course:$("#fCourse"),state:$("#fState"),cat:$("#fCat"),amt:$("#fAmt"),status:$("#fStatus"),sort:$("#sort")};
+function fill(sel,arr){arr.forEach(v=>sel.insertAdjacentHTML("beforeend",`<option>${esc(v)}</option>`))}
+fill(el.level,LEVELS);fill(el.course,COURSES);fill(el.state,STATES);fill(el.cat,CATS);
+fill($("#pLevel"),LEVELS);fill($("#pCourse"),COURSES);fill($("#pState"),STATES);
+const Q={page:1};
+function readURL(){const u=new URLSearchParams(location.search);F.forEach(k=>{const v=u.get(k);if(k==="page")Q.page=Math.max(1,parseInt(v)||1);else if(el[k]){if(el[k].tagName==="SELECT"&&v&&![...el[k].options].some(o=>o.value===v||o.text===v))return;el[k].value=v||(k==="sort"?"deadline":"")}})}
+function writeURL(){const u=new URLSearchParams();F.forEach(k=>{const v=k==="page"?(Q.page>1?Q.page:""):el[k].value;if(v&&!(k==="sort"&&v==="deadline"))u.set(k,v)});
+  try{history.replaceState(null,"",u.toString()?"?"+u:location.pathname)}catch(e){}}
+
+/* ---------- search ---------- */
+const PER=6;
+function search(){
+  const q=el.q.value.trim().toLowerCase(),[lo,hi]=(el.amt.value||"").split("-");const t=Date.now();
+  let r=SCH.filter(s=>{
+    if(q&&!(s.title+" "+s.provider+" "+s.desc).toLowerCase().includes(q))return false;
+    if(el.level.value&&!s.levels.includes(el.level.value))return false;
+    if(el.course.value&&s.courses.length&&!s.courses.includes(el.course.value))return false;
+    if(el.state.value&&s.states.length&&!s.states.includes(el.state.value))return false;
+    if(el.cat.value&&s.cat!==el.cat.value)return false;
+    if(el.amt.value){if(lo&&s.max<+lo)return false;if(hi&&s.min>+hi)return false}
+    const open=s.deadline==null||s.deadline>t;
+    if(el.status.value==="open"&&!open)return false;
+    if(el.status.value==="closed"&&open)return false;
+    if(el.status.value==="soon"&&!(s.deadline&&s.deadline>t&&s.deadline-t<=14*day))return false;
+    return true});
+  const so=el.sort.value, live=s=>s.deadline!=null&&s.deadline>t;
+  r.sort((a,b)=>so==="amount"?b.max-a.max:so==="verified"?b.verified-a.verified:so==="title"?a.title.localeCompare(b.title):
+    (live(b)-live(a))||((a.deadline??Infinity)-(b.deadline??Infinity)));
+  return r}
+
+function card(s,i){
+  const e=hasProfile()?eligibility(s,S.profile):null, saved=S.saved.includes(s.id);
+  return`<article class="card" style="--i:${i}">
+    <div class="tags"><span class="tag">${esc(s.cat)}</span><span class="tag g">Demo · unverified</span></div>
+    <h3>${esc(s.title)}</h3><div class="prov">${esc(s.provider)}</div>
+    <div class="amt">${INR(s.min)} – ${INR(s.max)} <span style="font-weight:500;color:var(--muted);font-size:13px">(as listed)</span></div>
+    <p class="d">${esc(s.desc)}</p>
+    ${cdHTML(s.deadline)}<div class="dl-date">${fmtDate(s.deadline)}</div>
+    ${e?`<div class="elig ${e.k}"><div><b>${e.label}</b></div></div>`:""}
+    <div class="actions"><button class="btn btn-p btn-sm" data-open="${s.id}">View details</button>
+    <button class="save" data-save="${s.id}" aria-pressed="${saved}">${saved?"★ Saved":"☆ Save"}</button></div></article>`}
+
+function render(){
+  const g=$("#grid");g.setAttribute("aria-busy","true");
+  g.innerHTML=Array(3).fill('<div class="skel"></div>').join("");
+  requestAnimationFrame(()=>setTimeout(()=>{
+    const all=search(),pages=Math.max(1,Math.ceil(all.length/PER));Q.page=Math.min(Q.page,pages);
+    const list=all.slice((Q.page-1)*PER,Q.page*PER);
+    $("#count").textContent=all.length+" scholarship"+(all.length===1?"":"s")+" found";
+    g.innerHTML=list.length?list.map(card).join(""):`<div class="empty"><svg viewBox="0 0 120 90"><rect x="20" y="14" width="80" height="62" rx="10" fill="#eceafe"/><circle cx="56" cy="42" r="14" fill="none" stroke="#4f46e5" stroke-width="5"/><path d="M67 53l14 14" stroke="#4f46e5" stroke-width="5" stroke-linecap="round"/></svg><h3>No scholarships match these filters</h3><p style="color:var(--muted)">Try removing a filter or searching a broader keyword.</p><button class="btn btn-p" id="reset2">Reset filters</button></div>`;
+    g.setAttribute("aria-busy","false");
+    const p=$("#pager");p.innerHTML=pages>1?`<button ${Q.page===1?"disabled":""} data-pg="${Q.page-1}" aria-label="Previous page">‹</button>`+Array.from({length:pages},(_,i)=>`<button data-pg="${i+1}" ${i+1===Q.page?'aria-current="page"':""}>${i+1}</button>`).join("")+`<button ${Q.page===pages?"disabled":""} data-pg="${Q.page+1}" aria-label="Next page">›</button>`:"";
+    const pt=$("#profTag");pt.hidden=!hasProfile();pt.textContent="Eligibility shown for your profile";
+    writeURL()},180))}
+
+/* ---------- modal ---------- */
+function openDetail(id){
+  const s=SCH.find(x=>x.id===id);if(!s)return;
+  const e=eligibility(s,S.profile),ck=S.checks[id]||{},done=s.docs.filter(d=>ck[d]).length,pct=Math.round(done/s.docs.length*100);
+  const st=S.apps[id]||"";
+  $("#dBody").innerHTML=`<div class="m-h"><div><div class="tags" style="margin-bottom:8px"><span class="tag">${esc(s.cat)}</span><span class="tag g">Demo data — unverified</span></div><h2 id="dTitle" style="font-size:24px">${esc(s.title)}</h2><div class="prov">${esc(s.provider)}</div></div><button class="x" data-close aria-label="Close">✕</button></div>
+  <div class="m-b"><p>${esc(s.desc)}</p>${cdHTML(s.deadline)}
+  <dl class="kv"><dt>Deadline</dt><dd>${fmtDate(s.deadline)}</dd><dt>Award as listed</dt><dd>${INR(s.min)} – ${INR(s.max)}</dd>
+  <dt>Education level</dt><dd>${esc(s.levels.join(", "))}</dd><dt>States</dt><dd>${s.states.length?esc(s.states.join(", ")):"All states"}</dd>
+  <dt>Courses</dt><dd>${s.courses.length?esc(s.courses.join(", ")):"Any course"}</dd><dt>Income limit</dt><dd>${s.income!=null?INR(s.income):"None documented"}</dd>
+  <dt>Last verified</dt><dd>${s.verifiedAgo===0?"Today":s.verifiedAgo+" days ago"} (demo)</dd></dl>
+  <div class="elig ${e.k}" style="margin-bottom:16px"><div><b>${e.label}</b>${e.reasons.length?`<ul>${e.reasons.map(r=>`<li>${esc(r)}</li>`).join("")}</ul>`:"No restrictions documented."}${hasProfile()?"":'<div style="margin-top:4px">Add a profile to personalise this.</div>'}</div></div>
+  <h3 style="font-size:17px;margin-bottom:8px">Application status</h3>
+  <select id="appSel" aria-label="Application status" style="margin-bottom:16px"><option value="">Not tracking</option>${STATUSES.map(x=>`<option ${x===st?"selected":""}>${x}</option>`).join("")}</select>
+  <div style="display:flex;justify-content:space-between;align-items:center"><h3 style="font-size:17px">Document checklist</h3><b id="pctTxt">${done}/${s.docs.length} ready</b></div>
+  <div class="prog" style="margin:8px 0 12px" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><i id="pctBar" style="width:${pct}%"></i></div>
+  ${s.docs.map((d,i)=>`<label class="chk"><input type="checkbox" data-doc="${esc(d)}" ${ck[d]?"checked":""}><span class="box"><svg viewBox="0 0 16 16"><path d="M3 8.5l3.2 3.2L13 4.5"/></svg></span><span class="t">${esc(d)}</span></label>`).join("")}
+  <p style="color:var(--muted);font-size:13px">Sample checklist. Real requirements come from the provider's verified information. Add your own items in a production build.</p>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px"><button class="btn btn-s" data-save="${s.id}" aria-pressed="${S.saved.includes(id)}">${S.saved.includes(id)?"★ Saved":"☆ Save"}</button><a class="btn btn-p" href="#" onclick="event.preventDefault();toast('Demo listing: no real application link')">Open official site ↗</a></div></div>`;
+  const dlg=$("#dlg");dlg.dataset.id=id;if(!dlg.open)dlg.showModal()}
+
+/* ---------- dashboard ---------- */
+function dash(){
+  const saved=SCH.filter(s=>S.saved.includes(s.id)),apps=Object.keys(S.apps).filter(k=>S.apps[k]);
+  const prog=apps.filter(k=>!["Submitted","Awarded","Not selected","Withdrawn"].includes(S.apps[k])).length;
+  let tot=0,dn=0;saved.concat(SCH.filter(s=>S.apps[s.id]&&!S.saved.includes(s.id))).forEach(s=>{tot+=s.docs.length;dn+=s.docs.filter(d=>(S.checks[s.id]||{})[d]).length});
+  const t=Date.now(),up=saved.filter(s=>s.deadline&&s.deadline>t).sort((a,b)=>a.deadline-b.deadline);
+  $("#navCount").textContent=saved.length;
+  $("#hello").textContent=S.profile.name?`Welcome back, ${S.profile.name}`:"Your dashboard";
+  const pct=tot?Math.round(dn/tot*100):0;
+  $("#stats").innerHTML=[[saved.length,"Saved scholarships"],[prog,"Applications in progress"],[up.length,"Upcoming deadlines"]].map((x,i)=>`<div class="stat rv" style="--i:${i}"><b>${x[0]}</b><span>${x[1]}</span></div>`).join("")+`<div class="stat rv" style="--i:3"><b>${pct}%</b><span>Checklist completion</span><div class="prog" style="margin-top:10px"><i style="width:${pct}%"></i></div></div>`;
+  const none=m=>`<p style="color:var(--muted);margin:10px 0">${m}</p>`;
+  $("#upcoming").innerHTML=up.length?up.slice(0,5).map(s=>{const x=dl(s.deadline);return`<div class="row"><div><b>${esc(s.title)}</b><div class="dl-date">${fmtDate(s.deadline)}</div></div><span class="tag ${x.state==="urgent"?"r":x.state==="soon"?"a":"t"}">${x.d}d ${x.h}h</span></div>`}).join(""):none("Save scholarships to see their deadlines here.");
+  $("#apps").innerHTML=apps.length?apps.map(k=>{const s=SCH.find(x=>x.id===k);return`<div class="row"><div><b>${esc(s.title)}</b></div><span class="tag">${esc(S.apps[k])}</span></div>`}).join(""):none("Set an application status from any scholarship's details.");
+  $("#savedList").innerHTML=saved.length?saved.map(s=>`<div class="row"><div><b>${esc(s.title)}</b><div class="dl-date">${esc(s.provider)}</div></div><div style="display:flex;gap:6px"><button class="btn btn-s btn-sm" data-open="${s.id}">Details</button><button class="btn btn-s btn-sm" data-save="${s.id}">Remove</button></div></div>`).join(""):none("Nothing saved yet. Tap ☆ Save on any scholarship.")}
+
+/* ---------- events ---------- */
+document.addEventListener("click",e=>{
+  const o=e.target.closest("[data-open]");if(o){openDetail(o.dataset.open);return}
+  const sv=e.target.closest("[data-save]");if(sv){const id=sv.dataset.save,i=S.saved.indexOf(id);
+    if(i>-1){S.saved.splice(i,1);toast("Removed from saved")}else{S.saved.push(id);toast("Saved to your dashboard")}
+    persist();api("/api/saved/toggle",{method:"POST",body:JSON.stringify({scholarshipId:id})});dash();render();if($("#dlg").open&&$("#dlg").dataset.id===id)openDetail(id);return}
+  if(e.target.closest("[data-close]")||e.target===$("#dlg"))$("#dlg").close();
+  const pg=e.target.closest("[data-pg]");if(pg){Q.page=+pg.dataset.pg;render();$("#finder").scrollIntoView({behavior:"smooth"});return}
+  if(e.target.id==="reset"||e.target.id==="reset2")resetF();
+});
+function resetF(){Object.values(el).forEach(x=>x.value="");el.sort.value="deadline";Q.page=1;render();toast("Filters reset")}
+Object.values(el).forEach(x=>x.addEventListener("input",()=>{Q.page=1;clearTimeout(x._t);x._t=setTimeout(render,x.tagName==="INPUT"?220:0)}));
+$("#heroSearch").addEventListener("submit",e=>{e.preventDefault();el.q.value=$("#heroQ").value;Q.page=1;render();$("#finder").scrollIntoView({behavior:"smooth"})});
+$("#toggleF").addEventListener("click",function(){const f=$("#filters"),h=f.style.display==="none";f.style.display=h?"":"none";this.setAttribute("aria-expanded",h)});
+$("#dlg").addEventListener("change",e=>{const id=$("#dlg").dataset.id;
+  if(e.target.matches("[data-doc]")){(S.checks[id]=S.checks[id]||{})[e.target.dataset.doc]=e.target.checked;persist();
+    api(`/api/checklist/${id}`,{method:"PUT",body:JSON.stringify({doc:e.target.dataset.doc,completed:e.target.checked})});
+    const s=SCH.find(x=>x.id===id),d=s.docs.filter(x=>S.checks[id][x]).length,p=Math.round(d/s.docs.length*100);
+    $("#pctBar").style.width=p+"%";$("#pctTxt").textContent=d+"/"+s.docs.length+" ready";dash()}
+  if(e.target.id==="appSel"){if(e.target.value)S.apps[id]=e.target.value;else delete S.apps[id];persist();
+    api(`/api/applications/${id}`,{method:"PUT",body:JSON.stringify({status:e.target.value})});
+    dash();toast(e.target.value?"Status: "+e.target.value:"Tracking removed")}});
+$("#profForm").addEventListener("submit",e=>{e.preventDefault();
+  const inc=$("#pIncome").value;if(inc!==""&&(+inc<0||isNaN(+inc))){toast("Enter a valid income");return}
+  S.profile={name:$("#pName").value.trim().slice(0,60),level:$("#pLevel").value,state:$("#pState").value,course:$("#pCourse").value,income:inc===""?"":+inc};
+  persist();api("/api/profile",{method:"PUT",body:JSON.stringify(S.profile)});render();dash();toast("Profile saved — eligibility updated")});
+$("#clearProf").addEventListener("click",()=>{S.profile={};persist();api("/api/profile",{method:"DELETE"});["pName","pLevel","pState","pCourse","pIncome"].forEach(i=>$("#"+i).value="");render();dash();toast("Profile cleared")});
+
+/* ---------- init ---------- */
+(function init(){const p=S.profile||{};$("#pName").value=p.name||"";$("#pLevel").value=p.level||"";$("#pState").value=p.state||"";$("#pCourse").value=p.course||"";$("#pIncome").value=p.income??"";
+  el.sort.value="deadline";readURL();render();dash();
+  api("/api/dashboard").then(res=>{if(res&&res.success&&res.rawState){S=res.rawState;persist();const p=S.profile||{};$("#pName").value=p.name||"";$("#pLevel").value=p.level||"";$("#pState").value=p.state||"";$("#pCourse").value=p.course||"";$("#pIncome").value=p.income??"";render();dash()}});
+})();
+</script>
+</body>
+</html>
